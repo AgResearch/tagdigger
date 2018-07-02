@@ -52,7 +52,13 @@ elif args.cutsite != None:
 if args.directory != None:
     if not os.path.isdir(args.directory):
         raise Exception("Directory {} not found".format(args.directory))
+    current_dir=os.path.realpath(os.getcwd())
+    args_dir=os.path.realpath(os.path.abspath(args.directory))
     os.chdir(args.directory)
+    # check we changed 
+    if os.path.realpath(os.getcwd()) != args_dir: 
+        raise Exception("tried but failed to cd to %s (i.e. %s) (I am in %s)- giving up"%(args.directory, args_dir, os.getcwd()))
+
 
 # determine tag file format
 tagformat = [args.UNEAKtags != None, args.MergedTags != None,
@@ -105,7 +111,7 @@ tags = tagdigger_fun.sanitizeTags(tags)
 # read barcode file
 bckeys = tagdigger_fun.readBarcodeKeyfile(args.barcodefile)
 if bckeys == None:
-    raise Exception("Problem reading barcode file.")
+    raise Exception("Problem reading barcode file (%s)"%args.barcodefile)
 # check fastq files
 fqfiles = sorted(bckeys.keys())
 fqok = [tagdigger_fun.isFastq(f) for f in fqfiles]
